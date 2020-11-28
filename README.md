@@ -77,7 +77,7 @@ class MyActivity: DaggerAppCompatActivity{
 ```
 
 ### Setting modules for subcomponents generated with @ContributesAndroidInjector
-If custom modules are to be added to generated subcomponents that serves specific activity
+If custom modules are to be added to the generated subcomponent which serves specific activity
 simply add `(modules=[MyModule::class])` next to annotation like below.
 
 ActivityBuildersModule.kt:
