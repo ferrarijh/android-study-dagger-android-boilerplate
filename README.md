@@ -1,5 +1,5 @@
 # Boilerplate Project for dagger-android
-Principle - do not let 'clients' know its properties are injected from outside.
+Principle - do not let 'clients' know of its properties getting injected from outside.
 
 For example,
 ```kotlin
@@ -11,7 +11,7 @@ val component = (application as BaseApplication).appComponent
 component.inject(this)
 ```
 
-Such boilerplate code had better be not present in MainActivity.
+Such boilerplate code had better be not present in `MainActivity` here.
 Dagger android relieves us of such pain.
 
 ## Setup
@@ -76,4 +76,15 @@ class MyActivity: DaggerAppCompatActivity{
 }
 ```
 
-Done!
+### Setting modules for subcomponents generated with @ContributesAndroidInjector
+If custom modules are to be added to generated subcomponents that serves specific activity
+simply add `(modules=[MyModule::class])` next to annotation like below.
+
+ActivityBuildersModule.kt:
+```kotlin
+@Module
+class ActivityBuildersModule{
+    @ContributesAndroidInjector(modules=[MyModule::class])    
+    fun contributesMainActivity(): MainActivity                    
+}
+```
