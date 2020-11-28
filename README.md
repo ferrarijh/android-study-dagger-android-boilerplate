@@ -1,5 +1,8 @@
 # Boilerplate Project for dagger-android
-Principle - do not let 'clients' know of its properties getting injected from outside.
+* Principle - do not let 'clients' know of its properties getting injected from outside.
+* Think of 'component' as service provider and our app as client.
+* With dagger android there's no need to inject your activity into components manually.
+-- (in `MainActivity`, you don't need to write `component.inject(this)` anymore)
 
 For example,
 ```kotlin
@@ -16,8 +19,18 @@ Dagger android relieves us of such pain.
 
 ## Setup
 
-### AppComponent
-AppComponent extends special class and a special module.
+build.gradle:
+```
+    def dagger_version = '2.xx'
+    implementation "com.google.dagger:dagger:$dagger_version"
+    implementation "com.google.dagger:dagger-android:$dagger_version"
+    implementation "com.google.dagger:dagger-android-support:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+    kapt "com.google.dagger:dagger-android-processor:$dagger_version"
+```
+
+### AppComponent with AndroidInjector<T>
+`AppComponent` extends special class and a special module.
 Also define builder(or factory) to inject `BaseApplication` into the component.
 
 AppComponent.kt:
@@ -36,6 +49,9 @@ interface AppComponent: AndroidInjector<BaseApplication>{
     }
 }
 ```
+
+Now `AppComponent` implements `AndroidInjector<T>` and T is your base application class - 
+Base application of type `T` is injected into `AppComponent`.
 
 ### ActivityBuildersModule
 
@@ -87,4 +103,20 @@ class ActivityBuildersModule{
     @ContributesAndroidInjector(modules=[MyModule::class])    
     fun contributesMainActivity(): MainActivity                    
 }
+```
+
+## Solved Issues
+* Error ```Map<K, V> cannot be provided without an @Provides-annotated method``` occurred still after
+adding `@JvmSuppressWildcards` in front of `Providers<>` parameter
+- solved by changing return types of methods annotated `@Provides`/`@Binds` to top parent class from
+exact parameter type.
+
+```kotlin
+    @Module
+    abstract class AuthViewModelModule {
+        @Binds
+        @IntoMap
+        @ViewModelKey(AuthViewModel::class)
+        abstract fun bindAuthViewModel(vm: AuthViewModel): ViewModel    //return type should NOT be AuthViewModel
+    }
 ```
